@@ -138,10 +138,6 @@ public class OutputGenerator {
                 .getViews()
                 .getConfiguration()
                 .addProperty(StructurizrPlantUMLExporter.PLANTUML_SEQUENCE_DIAGRAMS_PROPERTY, "false");
-        if (workspace == null) {
-            throw new IllegalArgumentException("A workspace must be provided.");
-        }
-
         Collection<Diagram> diagrams = new ArrayList<>();
 
         for (SystemLandscapeView view : workspace.getViews().getSystemLandscapeViews()) {

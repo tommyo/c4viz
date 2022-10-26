@@ -11,8 +11,8 @@ import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.ProtocolException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 
@@ -28,7 +28,7 @@ import java.nio.file.Paths;
 @Service
 public class SourceHandler {
     final private String cacheDir;
-    static private Logger logger = LoggerFactory.getLogger(SourceHandler.class);
+    // static private Logger logger = LoggerFactory.getLogger(SourceHandler.class);
 
     SourceHandler() throws FileNotFoundException {
         String tmpCacheDir = System.getenv("C4VIZ_CACHE");
