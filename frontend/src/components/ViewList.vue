@@ -16,27 +16,30 @@
 </template>
 
 <script>
+import jQuery from 'jquery'
+import scrollTo from 'jquery.scrollto'
+
 export default {
-    props: [ 'vizArray', 'current' ],
-    mounted: function () {
-        this.scrollCurrentIntoView({ behavior: 'smooth', block: 'center' })
-    },
-    methods: {
-        scrollCurrentIntoView: function () {
-            this.$nextTick(function () {
-                let scrollable = jQuery('#view-list-scrollable')
-                let element = jQuery('.view-list .view.current')
-                if (element) {
-                    scrollable.scrollTo(element, 700)
-                }
-            })
+  props: ['vizArray', 'current'],
+  mounted: function () {
+    this.scrollCurrentIntoView({ behavior: 'smooth', block: 'center' })
+  },
+  methods: {
+    scrollCurrentIntoView: function () {
+      this.$nextTick(function () {
+        const scrollable = jQuery('#view-list-scrollable')
+        const element = jQuery('.view-list .view.current')
+        if (element) {
+          scrollable.scrollTo(element, 700)
         }
-    },
-    watch: {
-        current: function () {
-            this.scrollCurrentIntoView()
-        }
+      })
     }
+  },
+  watch: {
+    current: function () {
+      this.scrollCurrentIntoView()
+    }
+  }
 }
 </script>
 

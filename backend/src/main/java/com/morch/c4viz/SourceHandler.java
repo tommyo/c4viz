@@ -11,8 +11,6 @@ import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.ProtocolException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 
@@ -35,7 +33,7 @@ public class SourceHandler {
         if (tmpCacheDir == null)
             tmpCacheDir = "/tmp";
         cacheDir = tmpCacheDir;
-        if ( ! Files.exists(Paths.get(cacheDir)) || ! Files.isDirectory(Paths.get(cacheDir))) {
+        if (!Files.exists(Paths.get(cacheDir)) || ! Files.isDirectory(Paths.get(cacheDir))) {
             throw new FileNotFoundException("cache dir " + cacheDir + " doesn't exist");
         }
     }
@@ -103,7 +101,7 @@ public class SourceHandler {
 
     private Path resolveSource(String hash, String source) throws IOException {
         String lowerSource = source.toLowerCase();
-        Path resolved;
+        
         //noinspection HttpUrlsUsage
         if (lowerSource.startsWith("http://") || lowerSource.startsWith("https://")) {
             CloseableHttpClient client = HttpClientBuilder.create().build();
@@ -140,38 +138,27 @@ public class SourceHandler {
                 fileOutputStream.write(responseBytes);
                 fileOutputStream.close();
             }
-            resolved = outputPath;
-        } else {
-            String regex = "^[a-zA-Z0-9.\\-]+$";
-            if (! source.matches(regex)) {
-                throw new RuntimeException(String.format("Source '%s' doesn't match: %s", source, regex));
-            }
-            String sourceDir = System.getenv("C4VIZ_SOURCE_DIR");
-            if (sourceDir == null) {
-                throw new RuntimeException("C4VIZ_SOURCE_DIR environment must be set");
-            }
-            resolved = Paths.get(sourceDir, source);
+            return outputPath;
         }
-        if (! Files.exists(resolved)) {
-            throw new FileNotFoundException("Couldn't find " + resolved);
-        }
-        return resolved;
+        String regex = "^[a-zA-Z0-9.\\-]+$";
+        if (! source.matches(regex)) {
+            throw new RuntimeException(String.format("Source '%s' doesn't match: %s", source, regex));
+        }        
+        return FileList.resolve(source);
     }
 
-    public VizOutput getResult(String source, String render) throws IOException, StructurizrDslParserException {
+    public VizOutput getResult(String source, Boolean render) throws IOException, StructurizrDslParserException {
         String hash = getSourceHash(source);
         Path sourceFile = resolveSource(hash, source);
         if (sourceFile.toString().toLowerCase().endsWith(".viz.json")) {
             return getResultFromSourceFile(sourceFile);
-        } else {
-            if (render != null && render.equals("true")) {
-                return render(hash, sourceFile);
-            } else {
-                if (needsRender(hash, sourceFile)) {
-                    return new VizPending();
-                }
-                return existingRender(hash);
-            }
         }
+        if (render) {
+            return render(hash, sourceFile);
+        }
+        if (needsRender(hash, sourceFile)) {
+            return new VizPending();
+        }
+        return existingRender(hash);
     }
 }

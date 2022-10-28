@@ -39,25 +39,27 @@
 </template>
 
 <script>
-import CurrentView from "./components/CurrentView.vue";
-import ViewList from "./components/ViewList.vue";
+import jQuery from 'jquery'
+
+import CurrentView from './components/CurrentView.vue'
+import ViewList from './components/ViewList.vue'
 import * as Constants from './Constants.js'
 
-function modifyVizSvgs(vizArray) {
+function modifyVizSvgs (vizArray) {
   // Unfortunately, the output from PlantUML is not ideal for our display requirements,
   // so modify the SVG files that we got from the server before using them.
 
   // var start = new Date().getTime();
 
-  for (let view of vizArray) {
-    let hidden = jQuery('<div style="display: none"></div>');
-    let svg = hidden.append(view.svg).find("> svg");
+  for (const view of vizArray) {
+    const hidden = jQuery('<div style="display: none"></div>')
+    const svg = hidden.append(view.svg).find('> svg')
     svg
-      .removeAttr("preserveAspectRatio")
-      .removeAttr("width")
-      .removeAttr("height")
-      .css("width", "")
-      .css("height", "");
+      .removeAttr('preserveAspectRatio')
+      .removeAttr('width')
+      .removeAttr('height')
+      .css('width', '')
+      .css('height', '')
     view.svg = svg[0].outerHTML
     svg
       .find('a')
@@ -73,68 +75,68 @@ function modifyVizSvgs(vizArray) {
   // console.log("Execution time: " + time);
 }
 
-function setTitle(title) {
+function setTitle (title) {
   if (title) {
-    document.title = "C4Viz: " + title;
+    document.title = 'C4Viz: ' + title
   } else {
-    document.title = "C4Viz"
+    document.title = 'C4Viz'
   }
 }
 
 export default {
-  name: "App",
-  props: [ 'views' ],
+  name: 'App',
+  props: ['views'],
   data: function () {
     return {
       current: null,
       vizArray: null,
       vizMap: {},
-      serverError: null,
-    };
+      serverError: null
+    }
   },
   mounted: function () {
     const udpateVizData = (vizArray) => {
-        // console.log("setting vizArray");
-        modifyVizSvgs(vizArray)
-        this.vizArray = vizArray;
-        for (let viz of vizArray) {
-          this.vizMap[viz.shortName] = viz
-        }
-        // console.log("views", this.views, Object.keys(this.vizMap));
-        if (this.views.length > 0) {
-          this.updateCurrentFromViews(this.views)
-        } else {
-          this.$router.replace({ name: 'views', params: { views: [vizArray[0].shortName] } })
-        }
+      // console.log("setting vizArray");
+      modifyVizSvgs(vizArray)
+      this.vizArray = vizArray
+      for (const viz of vizArray) {
+        this.vizMap[viz.shortName] = viz
+      }
+      // console.log("views", this.views, Object.keys(this.vizMap));
+      if (this.views.length > 0) {
+        this.updateCurrentFromViews(this.views)
+      } else {
+        this.$router.replace({ name: 'views', params: { views: [vizArray[0].shortName] } })
+      }
     }
     const fetchVizData = (render) => {
-      let url = new URL(document.location)
-      url.pathname = "/api/c4viz"
+      const url = new URL(document.location)
+      url.pathname = '/api/c4viz'
       if (render) {
         url.searchParams.append('render', 'true')
       }
       fetch(url)
         .then((res) => res.json())
         .then((result) => {
-          if ("pending" in result) {
+          if ('pending' in result) {
             if (render) {
-              throw new Error("How could result be pending with render == true");
+              throw new Error('How could result be pending with render == true')
             }
             // Try again - this time with rendering true
-            fetchVizData(true);
-          } else if ("viz" in result) {
-            udpateVizData(result.viz);
+            fetchVizData(true)
+          } else if ('viz' in result) {
+            udpateVizData(result.viz)
           } else {
-            if ("message" in result) {
+            if ('message' in result) {
               this.serverError = result.message
             } else {
-              this.serverError = "Unexpected message from server"
+              this.serverError = 'Unexpected message from server'
             }
           }
         })
         .catch(error => {
-          console.log("error", error)
-        });
+          console.log('error', error)
+        })
     }
     fetchVizData(false)
   },
@@ -143,11 +145,11 @@ export default {
       this.$router.push({ name: 'views', params: { views: [...this.views, newName] } })
     },
     updateCurrentFromViews: function (views) {
-      if (! (views instanceof Array)) {
-        throw new Error("How could value not be an array?")
+      if (!(views instanceof Array)) {
+        throw new Error('How could value not be an array?')
       }
       if (views.length > 0) {
-        this.current = this.vizMap[ views [ views.length - 1 ] ]
+        this.current = this.vizMap[views[views.length - 1]]
       } else {
         this.current = null
       }
@@ -161,17 +163,17 @@ export default {
       return this.current.displayTitle
     },
     breadcrumbs: function () {
-      let viewsCopy = [ ...this.views ]
-      let breadcrumbs = []
+      const viewsCopy = [...this.views]
+      const breadcrumbs = []
       while (viewsCopy.length > 0) {
-        let viewName = viewsCopy[ viewsCopy.length - 1 ];
-        if (! (viewName in this.vizMap)) {
+        const viewName = viewsCopy[viewsCopy.length - 1]
+        if (!(viewName in this.vizMap)) {
           return []
         }
         // console.log(viewName, Object.keys(this.vizMap));
-        let bc = {
+        const bc = {
           name: this.vizMap[viewName].displayTitle,
-          to: { name: 'views', params: { views: [ ...viewsCopy ] } },
+          to: { name: 'views', params: { views: [...viewsCopy] } }
         }
         breadcrumbs.unshift(bc)
         viewsCopy.pop()
@@ -184,7 +186,7 @@ export default {
   },
   watch: {
     svgTitle: function (value) {
-        setTitle(value);
+      setTitle(value)
     },
     views: function (value) {
       this.updateCurrentFromViews(value)
@@ -192,9 +194,9 @@ export default {
   },
   components: {
     CurrentView,
-    ViewList,
-  },
-};
+    ViewList
+  }
+}
 </script>
 
 <style>

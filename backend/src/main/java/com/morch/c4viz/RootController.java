@@ -11,15 +11,17 @@ import java.io.IOException;
 
 @RestController
 public class RootController {
+    
     private final SourceHandler sourceHandler;
 
     RootController(SourceHandler sourceHandler) {
         this.sourceHandler = sourceHandler;
     }
+
     @GetMapping("/api/c4viz")
     public VizOutput c4viz(
             @RequestParam(required = false) String source,
-            @RequestParam(required = false) String render
+            @RequestParam(required = false, defaultValue = "false") Boolean render
             ) throws IOException {
         return getVizOutput(source, render);
     }
@@ -31,7 +33,7 @@ public class RootController {
             @RequestParam String svg,
             @RequestParam(required = false) String source
     ) throws IOException {
-        VizOutput viz = getVizOutput(source, "true");
+        VizOutput viz = getVizOutput(source, true);
         VizResult result = (VizResult) viz;
         for (VizData data: result.viz) {
             if (data.getShortName().equals(svg)) {
@@ -43,7 +45,7 @@ public class RootController {
         );
     }
 
-    private VizOutput getVizOutput(String source, String render) throws IOException {
+    private VizOutput getVizOutput(String source, Boolean render) throws IOException {
         if (source == null) {
             source = System.getenv("C4VIZ_SOURCE");
         }

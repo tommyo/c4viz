@@ -1,1 +1,1 @@
-export const PAGE_LOADING = "Waiting for page to load..."
+export const PAGE_LOADING = 'Waiting for page to load...'
