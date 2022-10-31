@@ -25,10 +25,9 @@ dependencies {
     implementation 'com.structurizr:structurizr-graphviz:1.6.1'
     implementation 'net.sourceforge.plantuml:plantuml:1.2021.15'
     implementation 'com.structurizr:structurizr-core:1.13.0'
+    implementation 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
     implementation 'com.google.guava:guava:20.0'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.1.3'

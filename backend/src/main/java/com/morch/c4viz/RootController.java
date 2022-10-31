@@ -1,7 +1,11 @@
 package com.morch.c4viz;
 
 import com.structurizr.dsl.StructurizrDslParserException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,11 +15,19 @@ import java.io.IOException;
 
 @RestController
 public class RootController {
+
+    @Autowired
+    FileList files;
     
     private final SourceHandler sourceHandler;
 
     RootController(SourceHandler sourceHandler) {
         this.sourceHandler = sourceHandler;
+    }
+
+    @GetMapping("/api/files")
+    public String[] files() {
+        return files.list();
     }
 
     @GetMapping("/api/c4viz")
@@ -43,6 +55,12 @@ public class RootController {
         throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "svg " + svg + " not found"
         );
+    }
+
+    @MessageExceptionHandler
+    @SendTo("/topic/error")
+    public String handleException(Throwable exception) {
+        return exception.getMessage();
     }
 
     private VizOutput getVizOutput(String source, Boolean render) throws IOException {
